@@ -65,6 +65,7 @@ class CarState(CarStateBase):
     self.params = CarControllerParams(CP)
 
     # FrogPilot variables
+    self.drive_mode = 0
 
   def recent_button_interaction(self) -> bool:
     # On some newer model years, the CANCEL button acts as a pause/resume button based on the PCM state
@@ -301,6 +302,14 @@ class CarState(CarStateBase):
 
     # FrogPilot variables
     fp_ret = custom.FrogPilotCarState.new_message()
+
+    if "DRIVE_MODE" in cp.vl:
+      drive_mode = cp.vl["DRIVE_MODE"]["DRIVE_MODE2"]
+      if drive_mode != 0 and drive_mode != self.drive_mode:
+        self.drive_mode = drive_mode
+
+    fp_ret.ecoGear = self.drive_mode == 2
+    fp_ret.sportGear = self.drive_mode == 3
 
     return ret, fp_ret
 
