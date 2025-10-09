@@ -85,6 +85,7 @@ class ToyotaFlags(IntFlag):
 # FrogPilot variables
 class ToyotaFrogPilotFlags(IntFlag):
   SMART_DSU = 2
+  ZSS = 4
 
 
 def dbc_dict(pt, radar):
