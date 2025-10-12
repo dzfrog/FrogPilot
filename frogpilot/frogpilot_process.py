@@ -11,6 +11,8 @@ from openpilot.common.time_helpers import system_time_valid
 
 from openpilot.frogpilot.common.frogpilot_utilities import is_url_pingable, run_thread_with_lock
 from openpilot.frogpilot.controls.frogpilot_planner import FrogPilotPlanner
+from openpilot.frogpilot.system.frogpilot_stats import send_stats
+from openpilot.frogpilot.system.frogpilot_tracking import FrogPilotTracking
 
 ASSET_CHECK_RATE = (1 / DT_MDL)
 
@@ -54,12 +56,18 @@ def frogpilot_thread():
 
       params.put("LastGPSPosition", json.dumps(frogpilot_planner.gps_position))
 
+      if time_validated and is_url_pingable(os.environ.get("STATS_URL", "")):
+        send_stats(params)
+
     elif started and not started_previously:
       frogpilot_planner = FrogPilotPlanner()
+      frogpilot_tracking = FrogPilotTracking(frogpilot_planner, frogpilot_toggles)
 
     if started and sm.updated["modelV2"]:
       frogpilot_planner.update(now, time_validated, sm)
       frogpilot_planner.publish(sm, pm)
+
+      frogpilot_tracking.update(now, time_validated, sm)
     elif not started:
       frogpilot_plan_send = messaging.new_message("frogpilotPlan")
       pm.send("frogpilotPlan", frogpilot_plan_send)
