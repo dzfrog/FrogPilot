@@ -18,6 +18,7 @@ from openpilot.frogpilot.common.frogpilot_variables import EARTH_RADIUS
 running_threads = {}
 
 locks = {
+  "backup_toggles": threading.Lock(),
   "update_checks": threading.Lock(),
 }
 
