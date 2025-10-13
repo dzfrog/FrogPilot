@@ -3,7 +3,7 @@ from openpilot.common.params import Params
 from openpilot.selfdrive.selfdrived.events import ET, EVENT_NAME, FROGPILOT_EVENT_NAME, EventName, FrogPilotEventName, Events
 
 class FrogPilotEvents:
-  def __init__(self, FrogPilotPlanner):
+  def __init__(self, FrogPilotPlanner, error_log):
     self.params = Params()
     self.params_memory = Params(memory=True)
 
@@ -16,6 +16,8 @@ class FrogPilotEvents:
     self.max_acceleration = 0
 
     self.played_events = set()
+
+    self.error_log = error_log
 
   def update(self, v_cruise, sm, frogpilot_toggles):
     current_alert = sm["selfdriveState"].alertType
@@ -31,6 +33,9 @@ class FrogPilotEvents:
       self.max_acceleration = max(acceleration, self.max_acceleration)
     else:
       self.max_acceleration = 0
+
+    if self.error_log.is_file():
+      self.events.add(FrogPilotEventName.openpilotCrashed)
 
     self.startup_seen |= sm["frogpilotSelfdriveState"].alertText1 == frogpilot_toggles.startup_alert_top and sm["frogpilotSelfdriveState"].alertText2 == frogpilot_toggles.startup_alert_bottom
 
