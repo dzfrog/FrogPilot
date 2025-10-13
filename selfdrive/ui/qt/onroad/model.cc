@@ -96,6 +96,8 @@ void ModelRenderer::update_model(const cereal::ModelDataV2::Reader &model, const
   FrogPilotUIState *fs = frogpilotUIState();
   FrogPilotUIScene &frogpilot_scene = fs->frogpilot_scene;
   SubMaster &fpsm = *(fs->sm);
+
+  const cereal::FrogPilotPlan::Reader &frogpilotPlan = fpsm["frogpilotPlan"].getFrogpilotPlan();
 }
 
 void ModelRenderer::drawLaneLines(QPainter &painter) {

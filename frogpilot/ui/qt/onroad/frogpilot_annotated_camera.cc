@@ -35,9 +35,12 @@ void FrogPilotAnnotatedCameraWidget::updateState(const UIState &s, const FrogPil
   const SubMaster &fpsm = *(fs.sm);
 
   const cereal::CarState::Reader &carState = sm["carState"].getCarState();
+  const cereal::FrogPilotPlan::Reader &frogpilotPlan = fpsm["frogpilotPlan"].getFrogpilotPlan();
+  const cereal::FrogPilotSelfdriveState::Reader &frogpilotSelfdriveState = fpsm["frogpilotSelfdriveState"].getFrogpilotSelfdriveState();
   const cereal::SelfdriveState::Reader &selfdriveState = sm["selfdriveState"].getSelfdriveState();
 
   hideBottomIcons = selfdriveState.getAlertSize() != cereal::SelfdriveState::AlertSize::NONE;
+  hideBottomIcons |= frogpilotSelfdriveState.getAlertSize() != cereal::FrogPilotSelfdriveState::AlertSize::NONE;
 
   update();
 }
@@ -50,4 +53,5 @@ void FrogPilotAnnotatedCameraWidget::paintFrogPilotWidgets(QPainter &p, UIState 
   FrogPilotUIScene &frogpilot_scene = fs.frogpilot_scene;
 
   const cereal::CarState::Reader &carState = sm["carState"].getCarState();
+  const cereal::FrogPilotPlan::Reader &frogpilotPlan = fpsm["frogpilotPlan"].getFrogpilotPlan();
 }
