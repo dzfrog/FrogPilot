@@ -81,7 +81,7 @@ def frogpilot_thread():
     if not started and started_previously:
       run_update_checks = True
 
-      frogpilot_variables.update(started)
+      frogpilot_variables.update(theme_manager.holiday_theme, started)
       frogpilot_toggles = frogpilot_variables.frogpilot_toggles
 
       params.put("LastGPSPosition", json.dumps(frogpilot_planner.gps_position))
@@ -112,11 +112,12 @@ def frogpilot_thread():
     if rate_keeper.frame % ASSET_CHECK_RATE == 0:
       assets_checks(theme_manager, params_memory, frogpilot_toggles)
 
-    if params_memory.get_bool("FrogPilotTogglesUpdated"):
-      frogpilot_variables.update(started)
+    if params_memory.get_bool("FrogPilotTogglesUpdated") or theme_manager.theme_updated:
+      frogpilot_variables.update(theme_manager.holiday_theme, started)
       frogpilot_toggles = frogpilot_variables.frogpilot_toggles
 
-      theme_manager.update_active_theme(frogpilot_toggles)
+      theme_manager.theme_updated = False
+      theme_manager.update_active_theme(time_validated, frogpilot_toggles)
 
       if time_validated:
         run_thread_with_lock("backup_toggles", backup_toggles, (params, params_cache), report=False)
@@ -130,6 +131,7 @@ def frogpilot_thread():
     run_update_checks &= time_validated
 
     if run_update_checks:
+      theme_manager.update_active_theme(time_validated, frogpilot_toggles)
       run_thread_with_lock("update_checks", update_checks, (now, theme_manager, params, params_memory, frogpilot_toggles))
 
       run_update_checks = False
@@ -138,6 +140,7 @@ def frogpilot_thread():
       if not time_validated:
         continue
 
+      theme_manager.update_active_theme(time_validated, frogpilot_toggles)
       run_thread_with_lock("update_checks", update_checks, (now, theme_manager, params, params_memory, frogpilot_toggles, True))
 
     rate_keeper.keep_time()
