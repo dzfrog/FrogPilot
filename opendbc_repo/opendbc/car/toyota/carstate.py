@@ -53,6 +53,8 @@ class CarState(CarStateBase):
     self.gvc = 0.0
     self.secoc_synchronization = None
 
+    # FrogPilot variables
+
   def update(self, can_parsers) -> structs.CarState:
     cp = can_parsers[Bus.pt]
     cp_cam = can_parsers[Bus.cam]
@@ -199,6 +201,9 @@ class CarState(CarStateBase):
         buttonEvents += create_button_events(self.distance_button, prev_distance_button, {1: ButtonType.gapAdjustCruise})
 
     ret.buttonEvents = buttonEvents
+
+    # FrogPilot variables
+
     return ret
 
   @staticmethod
@@ -207,7 +212,11 @@ class CarState(CarStateBase):
       ("BLINKERS_STATE", float('nan')),
     ]
 
+    # FrogPilot variables
+    cam_messages = [
+    ]
+
     return {
       Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], pt_messages, 0),
-      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], [], 2),
+      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], cam_messages, 2),
     }

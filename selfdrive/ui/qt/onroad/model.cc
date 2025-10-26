@@ -35,7 +35,7 @@ void ModelRenderer::draw(QPainter &painter, const QRect &surface_rect) {
 
   update_model(model, lead_one);
   drawLaneLines(painter);
-  drawPath(painter, model, surface_rect.height());
+  drawPath(painter, model, surface_rect.height(), sm);
 
   if (longitudinal_control && sm.alive("radarState")) {
     update_leads(radar_state, model.getPosition());
@@ -47,6 +47,8 @@ void ModelRenderer::draw(QPainter &painter, const QRect &surface_rect) {
       drawLead(painter, lead_two, lead_vertices[1], surface_rect);
     }
   }
+
+  // FrogPilot variables
 
   painter.restore();
 }
@@ -89,6 +91,10 @@ void ModelRenderer::update_model(const cereal::ModelDataV2::Reader &model, const
   }
   max_idx = get_path_length_idx(model_position, max_distance);
   mapLineToPolygon(model_position, 0.9, path_offset_z, &track_vertices, max_idx, false);
+
+  // FrogPilot variables
+  FrogPilotUIState *fs = frogpilotUIState();
+  SubMaster &fpsm = *(fs->sm);
 }
 
 void ModelRenderer::drawLaneLines(QPainter &painter) {
@@ -105,7 +111,7 @@ void ModelRenderer::drawLaneLines(QPainter &painter) {
   }
 }
 
-void ModelRenderer::drawPath(QPainter &painter, const cereal::ModelDataV2::Reader &model, int height) {
+void ModelRenderer::drawPath(QPainter &painter, const cereal::ModelDataV2::Reader &model, int height, SubMaster &sm) {
   QLinearGradient bg(0, height, 0, 0);
   if (experimental_mode) {
     // The first half of track_vertices are the points for the right side of the path
@@ -140,6 +146,8 @@ void ModelRenderer::drawPath(QPainter &painter, const cereal::ModelDataV2::Reade
 
   painter.setBrush(bg);
   painter.drawPolygon(track_vertices);
+
+  // FrogPilot variables
 }
 
 void ModelRenderer::updatePathGradient(QLinearGradient &bg) {
@@ -217,6 +225,8 @@ void ModelRenderer::drawLead(QPainter &painter, const cereal::RadarState::LeadDa
   QPointF chevron[] = {{x + (sz * 1.25), y + sz}, {x, y}, {x - (sz * 1.25), y + sz}};
   painter.setBrush(QColor(201, 34, 49, fillAlpha));
   painter.drawPolygon(chevron, std::size(chevron));
+
+  // FrogPilot variables
 }
 
 // Projects a point in car to space to the corresponding point in full frame image space.
@@ -248,3 +258,5 @@ void ModelRenderer::mapLineToPolygon(const cereal::XYZTData::Reader &line, float
     }
   }
 }
+
+// FrogPilot variables
