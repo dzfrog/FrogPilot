@@ -31,7 +31,13 @@ void ExperimentalButton::changeMode() {
   bool can_change = hasLongitudinalControl(cp) && params.getBool("ExperimentalModeConfirmed");
   if (can_change) {
     // FrogPilot variables
-    params.putBool("ExperimentalMode", !experimental_mode);
+    if (frogpilot_toggles.value("conditional_experimental_mode").toBool()) {
+      int conditional_status = frogpilotUIState()->frogpilot_scene.conditional_status;
+      int override_value = (conditional_status == 1 || conditional_status == 2) ? 0 : experimental_mode ? 1 : 2;
+      params_memory.putInt("CEStatus", override_value);
+    } else {
+      params.putBool("ExperimentalMode", !experimental_mode);
+    }
   }
 }
 
@@ -74,6 +80,7 @@ void ExperimentalButton::updateBackgroundColor() {
   static const QMap<QString, QColor> status_color_map {
     {"default", QColor(0, 0, 0, 166)},
     {"always_on_lateral_active", bg_colors[STATUS_ALWAYS_ON_LATERAL_ACTIVE]},
+    {"conditional_overridden", bg_colors[STATUS_CONDITIONAL_OVERRIDDEN]},
     {"experimental_mode_enabled", bg_colors[STATUS_EXPERIMENTAL_MODE_ENABLED]}
   };
 
@@ -84,6 +91,8 @@ void ExperimentalButton::updateBackgroundColor() {
 
   if (frogpilot_scene.always_on_lateral_active) {
     background_color = status_color_map["always_on_lateral_active"];
+  } else if (frogpilot_scene.conditional_status == 1) {
+    background_color = status_color_map["conditional_overridden"];
   } else if (experimental_mode) {
     background_color = status_color_map["experimental_mode_enabled"];
   } else {
