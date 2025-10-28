@@ -34,6 +34,8 @@ protected:
   void showEvent(QShowEvent *event) override;
 
 private:
+  void paintBlindSpotPath(QPainter &p, SubMaster &sm, SubMaster &fpsm);
+
   float distanceConversion;
   float setSpeed;
   float speedConversion;
