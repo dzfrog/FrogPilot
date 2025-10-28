@@ -46,4 +46,8 @@ private:
 
   // FrogPilot variables
   bool model_ui;
+  bool use_stock_colors;
+
+  QColor lane_lines_color;
+  QColor path_color;
 };
