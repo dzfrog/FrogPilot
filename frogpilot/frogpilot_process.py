@@ -98,7 +98,7 @@ def frogpilot_thread():
       if error_log.is_file():
         error_log.unlink()
 
-      frogpilot_planner = FrogPilotPlanner(error_log)
+      frogpilot_planner = FrogPilotPlanner(error_log, theme_manager)
       frogpilot_tracking = FrogPilotTracking(frogpilot_planner, frogpilot_toggles)
 
     if started and sm.updated["modelV2"]:

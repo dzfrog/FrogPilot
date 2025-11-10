@@ -15,7 +15,7 @@ from openpilot.common.swaglog import cloudlog
 
 from openpilot.system import micd
 
-from openpilot.frogpilot.common.frogpilot_variables import ACTIVE_THEME_PATH, ERROR_LOGS_PATH, get_frogpilot_toggles
+from openpilot.frogpilot.common.frogpilot_variables import ACTIVE_THEME_PATH, ERROR_LOGS_PATH, RANDOM_EVENTS_PATH, get_frogpilot_toggles
 
 SAMPLE_RATE = 48000
 SAMPLE_BUFFER = 4096 # (approx 100ms)
@@ -47,7 +47,20 @@ sound_list: dict[int, tuple[str, int | None, float]] = {
   AudibleAlert.warningImmediate: ("warning_immediate.wav", None, MAX_VOLUME),
 
   # FrogPilot variables
+  FrogPilotAudibleAlert.angry: ("angry.wav", 1, MAX_VOLUME),
+  FrogPilotAudibleAlert.continued: ("continued.wav", 1, MAX_VOLUME),
+  FrogPilotAudibleAlert.dejaVu: ("dejaVu.wav", 1, MAX_VOLUME),
+  FrogPilotAudibleAlert.doc: ("doc.wav", 1, MAX_VOLUME),
+  FrogPilotAudibleAlert.fart: ("fart.wav", 1, MAX_VOLUME),
+  FrogPilotAudibleAlert.firefox: ("firefox.wav", 1, MAX_VOLUME),
   FrogPilotAudibleAlert.goat: ("goat.wav", None, MAX_VOLUME),
+  FrogPilotAudibleAlert.hal9000: ("hal9000.wav", 1, MAX_VOLUME),
+  FrogPilotAudibleAlert.mail: ("mail.wav", 1, MAX_VOLUME),
+  FrogPilotAudibleAlert.nessie: ("nessie.wav", 1, MAX_VOLUME),
+  FrogPilotAudibleAlert.noice: ("noice.wav", 1, MAX_VOLUME),
+  FrogPilotAudibleAlert.startup: ("startup.wav", 1, MAX_VOLUME),
+  FrogPilotAudibleAlert.thisIsFine: ("this_is_fine.wav", 1, MAX_VOLUME),
+  FrogPilotAudibleAlert.uwu: ("uwu.wav", 1, MAX_VOLUME),
 }
 
 def check_selfdrive_timeout_alert(sm):
@@ -82,6 +95,7 @@ class Soundd:
     self.previous_sound_pack = None
 
     self.error_log = ERROR_LOGS_PATH / "error.txt"
+    self.random_events_directory = RANDOM_EVENTS_PATH / "sounds"
 
     self.update_frogpilot_sounds()
 
@@ -92,9 +106,12 @@ class Soundd:
     for sound in sound_list:
       filename, play_count, volume = sound_list[sound]
 
+      random_events_path = self.random_events_directory / filename
       sounds_path = self.sound_directory / filename
 
-      if sounds_path.exists():
+      if random_events_path.exists():
+        wavefile = wave.open(str(random_events_path), 'r')
+      elif sounds_path.exists():
         wavefile = wave.open(str(sounds_path), 'r')
       else:
         if filename == "startup.wav":
