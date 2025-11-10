@@ -86,6 +86,9 @@ def frogpilot_thread():
       if frogpilot_toggles.lock_doors_timer != 0:
         run_thread_with_lock("lock_doors", lock_doors, (params, frogpilot_toggles.lock_doors_timer, sm), report=False)
 
+      if frogpilot_toggles.random_themes:
+        theme_manager.update_active_theme(time_validated, frogpilot_toggles, randomize_theme=True)
+
       frogpilot_variables.update(theme_manager.holiday_theme, started)
       frogpilot_toggles = frogpilot_variables.frogpilot_toggles
 
@@ -118,11 +121,17 @@ def frogpilot_thread():
       assets_checks(theme_manager, params_memory, frogpilot_toggles)
 
     if params_memory.get_bool("FrogPilotTogglesUpdated") or theme_manager.theme_updated:
+      previous_holiday_themes = frogpilot_toggles.holiday_themes
+      previous_random_themes = frogpilot_toggles.random_themes
+
       frogpilot_variables.update(theme_manager.holiday_theme, started)
       frogpilot_toggles = frogpilot_variables.frogpilot_toggles
 
+      randomize_theme = frogpilot_toggles.holiday_themes != previous_holiday_themes
+      randomize_theme |= frogpilot_toggles.random_themes != previous_random_themes
+
       theme_manager.theme_updated = False
-      theme_manager.update_active_theme(time_validated, frogpilot_toggles)
+      theme_manager.update_active_theme(time_validated, frogpilot_toggles, randomize_theme=randomize_theme)
 
       if time_validated:
         run_thread_with_lock("backup_toggles", backup_toggles, (params, params_cache), report=False)
