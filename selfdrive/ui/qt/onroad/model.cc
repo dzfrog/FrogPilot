@@ -197,10 +197,10 @@ QColor ModelRenderer::blendColors(const QColor &start, const QColor &end, float 
 }
 
 void ModelRenderer::drawLead(QPainter &painter, const cereal::RadarState::LeadData::Reader &lead_data,
-                             const QPointF &vd, const QRect &surface_rect) {
+                             const QPointF &vd, const QRect &surface_rect, bool adjacent) {
   const float speedBuff = 10.;
   const float leadBuff = 40.;
-  const float d_rel = lead_data.getDRel();
+  const float d_rel = lead_data.getDRel() + (adjacent ? fabs(lead_data.getYRel()) : 0);
   const float v_rel = lead_data.getVRel();
 
   float fillAlpha = 0;
