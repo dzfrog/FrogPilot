@@ -153,7 +153,9 @@ void ModelRenderer::drawPath(QPainter &painter, const cereal::ModelDataV2::Reade
       // Flip so 0 is bottom of frame
       float lin_grad_point = (height - track_vertices[track_idx].y()) / height;
 
-      if (fabs(acceleration[i]) < 0.25 && !use_stock_colors) {
+      if ((fabs(acceleration[i]) < 0.25 || !frogpilot_toggles.value("acceleration_path").toBool()) && frogpilot_toggles.value("rainbow_path").toBool()) {
+        frogpilot_nvg->paintRainbowPath(painter, bg, lin_grad_point);
+      } else if (fabs(acceleration[i]) < 0.25 && !use_stock_colors) {
         QColor color = path_color;
         color.setAlphaF(util::map_val(lin_grad_point, 0.0f, 1.0f, 1.0f, 0.1f));
         bg.setColorAt(lin_grad_point, color);
