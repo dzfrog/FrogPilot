@@ -109,6 +109,9 @@ void ModelRenderer::update_model(const cereal::ModelDataV2::Reader &model, const
   model_ui = frogpilot_toggles.value("model_ui").toBool();
   path_color = frogpilot_scene.path_color;
   use_stock_colors = frogpilot_scene.use_stock_colors;
+
+  mapAveragedLineToPolygon(lane_lines[0], lane_lines[1], frogpilotPlan.getLaneWidthLeft() / 2.0f, 0, &frogpilot_nvg->track_adjacent_vertices[0], max_idx, false);
+  mapAveragedLineToPolygon(lane_lines[2], lane_lines[3], frogpilotPlan.getLaneWidthRight() / 2.0f, 0, &frogpilot_nvg->track_adjacent_vertices[1], max_idx, false);
 }
 
 void ModelRenderer::drawLaneLines(QPainter &painter) {
@@ -284,6 +287,29 @@ void ModelRenderer::mapLineToPolygon(const cereal::XYZTData::Reader &line, float
 }
 
 // FrogPilot variables
+void ModelRenderer::mapAveragedLineToPolygon(const cereal::XYZTData::Reader &line1, const cereal::XYZTData::Reader &line2, float y_off, float z_off,
+                                             QPolygonF *pvd, int max_idx, bool allow_invert) {
+  const auto line_x = line1.getX(), line_y1 = line1.getY(), line_z1 = line1.getZ();
+  const auto line_y2 = line2.getY();
+  QPointF left, right;
+  pvd->clear();
+  for (int i = 0; i <= std::min({max_idx, (int)line_x.size() - 1, (int)line_y2.size() - 1}); i++) {
+    // highly negative x positions  are drawn above the frame and cause flickering, clip to zy plane of camera
+    if (line_x[i] < 0) continue;
+
+    bool l = mapToScreen(line_x[i], ((line_y1[i] + line_y2[i]) / 2.0f) - y_off, line_z1[i] + z_off, &left);
+    bool r = mapToScreen(line_x[i], ((line_y1[i] + line_y2[i]) / 2.0f) + y_off, line_z1[i] + z_off, &right);
+    if (l && r) {
+      // For wider lines the drawn polygon will "invert" when going over a hill and cause artifacts
+      if (!allow_invert && pvd->size() && left.y() > pvd->back().y()) {
+        continue;
+      }
+      pvd->push_back(left);
+      pvd->push_front(right);
+    }
+  }
+}
+
 void ModelRenderer::updateRadarTracks(const cereal::XYZTData::Reader &line) {
   frogpilot_nvg->radar_tracks.clear();
 

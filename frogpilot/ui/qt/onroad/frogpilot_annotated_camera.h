@@ -35,6 +35,8 @@ public:
   QPoint dmIconPosition;
   QPoint experimentalButtonPosition;
 
+  QPolygonF track_adjacent_vertices[2];
+
   QRect setSpeedRect;
 
   QSize defaultSize;
@@ -45,6 +47,7 @@ protected:
   void showEvent(QShowEvent *event) override;
 
 private:
+  void paintAdjacentPaths(QPainter &p, SubMaster &sm, SubMaster &fpsm);
   void paintBlindSpotPath(QPainter &p, SubMaster &sm, SubMaster &fpsm);
   void paintCEMStatus(QPainter &p, FrogPilotUIScene &frogpilot_scene, SubMaster &sm);
   void paintCompass(QPainter &p);
