@@ -106,7 +106,7 @@ void ModelRenderer::update_model(const cereal::ModelDataV2::Reader &model, const
 
   frogpilot_nvg->track_vertices = track_vertices;
 
-  mapLineToPolygon(model_position, model_ui ? path_width : 0, path_offset_z, &frogpilot_nvg->track_edge_vertices, max_idx, false);
+  mapLineToPolygon(model_position, frogpilot_toggles.value("model_ui").toBool() ? path_width : 0, path_offset_z, &frogpilot_nvg->track_edge_vertices, max_idx, false);
 
   mapAveragedLineToPolygon(lane_lines[0], lane_lines[1], frogpilotPlan.getLaneWidthLeft() / 2.0f, 0, &frogpilot_nvg->track_adjacent_vertices[0], max_idx, false);
   mapAveragedLineToPolygon(lane_lines[2], lane_lines[3], frogpilotPlan.getLaneWidthRight() / 2.0f, 0, &frogpilot_nvg->track_adjacent_vertices[1], max_idx, false);
@@ -147,7 +147,9 @@ void ModelRenderer::drawPath(QPainter &painter, const cereal::ModelDataV2::Reade
       // Flip so 0 is bottom of frame
       float lin_grad_point = (height - track_vertices[track_idx].y()) / height;
 
-      if (fabs(acceleration[i]) < 0.25 && !frogpilot_scene.use_stock_colors) {
+      if ((fabs(acceleration[i]) < 0.25 || !frogpilot_toggles.value("acceleration_path").toBool()) && frogpilot_toggles.value("rainbow_path").toBool()) {
+        frogpilot_nvg->paintRainbowPath(painter, bg, lin_grad_point);
+      } else if (fabs(acceleration[i]) < 0.25 && !frogpilot_scene.use_stock_colors) {
         QColor color = frogpilot_scene.path_color;
         color.setAlphaF(util::map_val(lin_grad_point, 0.0f, 1.0f, 1.0f, 0.1f));
         bg.setColorAt(lin_grad_point, color);
