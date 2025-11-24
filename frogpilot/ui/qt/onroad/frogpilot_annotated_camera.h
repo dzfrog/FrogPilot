@@ -17,6 +17,7 @@ public:
 
   void mousePressEvent(QMouseEvent *e) override;
   void paintFrogPilotWidgets(QPainter &p, UIState &s, FrogPilotUIState &fs, SubMaster &sm, SubMaster &fpsm);
+  void paintLeadMetrics(QPainter &p, bool adjacent, QPointF *chevron, const cereal::RadarState::LeadData::Reader &lead_data);
   void updateState(const UIState &s, const FrogPilotUIState &fs);
 
   bool hideBottomIcons;
@@ -62,6 +63,7 @@ private:
   void updateSignals();
 
   int animationFrameIndex;
+  int desiredFollowDistance;
   int frogHopCount;
   int signalAnimationLength;
   int signalHeight;
@@ -92,6 +94,8 @@ private:
 
   QPoint cemStatusPosition;
   QPoint compassPosition;
+
+  QRect leadTextRect;
 
   QSharedPointer<QMovie> cemCurveIcon;
   QSharedPointer<QMovie> cemLeadIcon;

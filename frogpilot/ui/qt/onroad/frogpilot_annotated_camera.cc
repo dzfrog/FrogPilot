@@ -134,6 +134,7 @@ void FrogPilotAnnotatedCameraWidget::updateState(const UIState &s, const FrogPil
   const cereal::FrogPilotSelfdriveState::Reader &frogpilotSelfdriveState = fpsm["frogpilotSelfdriveState"].getFrogpilotSelfdriveState();
   const cereal::SelfdriveState::Reader &selfdriveState = sm["selfdriveState"].getSelfdriveState();
 
+  desiredFollowDistance = frogpilotPlan.getDesiredFollowDistance();
   hideBottomIcons = selfdriveState.getAlertSize() != cereal::SelfdriveState::AlertSize::NONE;
   hideBottomIcons |= frogpilotSelfdriveState.getAlertSize() != cereal::FrogPilotSelfdriveState::AlertSize::NONE;
   hideBottomIcons |= signalStyle.startsWith("traditional") && (carState.getLeftBlinker() || carState.getRightBlinker());
@@ -510,6 +511,52 @@ void FrogPilotAnnotatedCameraWidget::paintCurveSpeedControlTraining(QPainter &p,
   p.drawText(textRect.adjusted(20, 0, 0, 0), Qt::AlignVCenter | Qt::AlignLeft, "Training...");
 
   p.restore();
+}
+
+void FrogPilotAnnotatedCameraWidget::paintLeadMetrics(QPainter &p, bool adjacent, QPointF *chevron, const cereal::RadarState::LeadData::Reader &lead_data) {
+  float leadDistance = lead_data.getDRel() + (adjacent ? fabs(lead_data.getYRel()) : 0);
+  float leadSpeed = std::max(lead_data.getVLead(), 0.0f);
+
+  p.setFont(InterFont(40, QFont::Bold));
+  p.setPen(QPen(whiteColor()));
+
+  QString text;
+  if (adjacent) {
+    text = QString("%1 %2 | %3 %4")
+              .arg(qRound(leadDistance * distanceConversion))
+              .arg(leadDistanceUnit)
+              .arg(qRound(leadSpeed * speedConversionMetrics))
+              .arg(leadSpeedUnit);
+  } else {
+    text = QString("%1 %2 (%3) | %4 %5 | %6 %7")
+              .arg(qRound(leadDistance * distanceConversion))
+              .arg(leadDistanceUnit)
+              .arg(QString(tr("Desired: %1")).arg(desiredFollowDistance * distanceConversion))
+              .arg(qRound(leadSpeed * speedConversionMetrics))
+              .arg(leadSpeedUnit)
+              .arg(QString::number(leadDistance / std::max(speed / speedConversion, 1.0f), 'f', 2))
+              .arg(tr("s"));
+  }
+
+  QFontMetrics metrics(p.font());
+  int textHeight = metrics.height();
+  int textWidth = metrics.horizontalAdvance(text);
+
+  int textX = ((chevron[2].x() + chevron[0].x()) / 2) - textWidth / 2;
+  int textY = chevron[0].y() + textHeight + 5;
+
+  if (!adjacent) {
+    int xMargin = textWidth * 0.25;
+    int yMargin = textHeight * 0.25;
+
+    leadTextRect = QRect(textX, textY - textHeight, textWidth, textHeight).adjusted(-xMargin, -yMargin, xMargin, yMargin);
+    p.drawText(textX, textY, text);
+  } else {
+    QRect adjacentTextRect(textX, textY - textHeight, textWidth, textHeight);
+    if (!adjacentTextRect.intersects(leadTextRect)) {
+      p.drawText(textX, textY, text);
+    }
+  }
 }
 
 void FrogPilotAnnotatedCameraWidget::paintPedalIcons(QPainter &p, SubMaster &sm, SubMaster &fpsm, FrogPilotUIScene &frogpilot_scene) {
