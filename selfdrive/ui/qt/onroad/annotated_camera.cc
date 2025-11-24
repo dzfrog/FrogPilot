@@ -23,6 +23,9 @@ AnnotatedCameraWidget::AnnotatedCameraWidget(VisionStreamType type, QWidget *par
   // FrogPilot variables
   personality_btn = new DrivingPersonalityButton(this);
   personality_btn->setVisible(false);
+
+  screen_recorder = new ScreenRecorder(this);
+  screen_recorder->setVisible(false);
 }
 
 void AnnotatedCameraWidget::updateState(const UIState &s, const FrogPilotUIState &fs) {
@@ -54,6 +57,9 @@ void AnnotatedCameraWidget::updateState(const UIState &s, const FrogPilotUIState
   }
 
   dmon.onroad_distance_btn_enabled = onroad_distance_btn_enabled;
+
+  screen_recorder->move(experimental_btn->x() - UI_BORDER_SIZE - btn_size, experimental_btn->y());
+  screen_recorder->setVisible(frogpilot_nvg->standstillDuration == 0 && !(frogpilot_nvg->signalStyle == "static" && carState.getRightBlinker()) && frogpilot_toggles.value("screen_recorder").toBool());
 }
 
 void AnnotatedCameraWidget::initializeGL() {
