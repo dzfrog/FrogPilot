@@ -133,7 +133,7 @@ class HyundaiFlags(IntFlag):
 
 
 # FrogPilot variables
-class HyundaiFrogPilotFlags(IntFlag):
+#class HyundaiFrogPilotFlags(IntFlag):
 
 
 @dataclass
