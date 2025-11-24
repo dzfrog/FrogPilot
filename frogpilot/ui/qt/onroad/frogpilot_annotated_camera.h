@@ -46,6 +46,7 @@ private:
   void paintCurveSpeedControlTraining(QPainter &p, SubMaster &fpsm);
   void paintRoadName(QPainter &p);
   void paintStandstillTimer(QPainter &p);
+  void paintStoppingPoint(QPainter &p, SubMaster &sm);
   void paintTurnSignals(QPainter &p, SubMaster &sm);
   void updateSignals();
 
@@ -74,6 +75,7 @@ private:
   QElapsedTimer standstillTimer;
 
   QPixmap curveSpeedIcon;
+  QPixmap stopSignImg;
 
   QPoint cemStatusPosition;
   QPoint compassPosition;
