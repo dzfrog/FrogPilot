@@ -6,6 +6,7 @@ from opendbc.car.interfaces import CarControllerBase
 from opendbc.car.tesla.teslacan import TeslaCAN
 from opendbc.car.tesla.values import CarControllerParams
 from opendbc.car.vehicle_model import VehicleModel
+from opendbc.car.tesla.coopsteering import CoopSteeringCarController
 
 
 def get_safety_CP():
@@ -15,12 +16,14 @@ def get_safety_CP():
   return CarInterface.get_non_essential_params("TESLA_MODEL_Y")
 
 
-class CarController(CarControllerBase):
+class CarController(CarControllerBase, CoopSteeringCarController):
   def __init__(self, dbc_names, CP):
     super().__init__(dbc_names, CP)
     self.apply_angle_last = 0
     self.packer = CANPacker(dbc_names[Bus.party])
     self.tesla_can = TeslaCAN(self.packer)
+
+    CoopSteeringCarController.__init__(self)
 
     # Vehicle model used for lateral limiting
     self.VM = VehicleModel(get_safety_CP())
@@ -39,7 +42,7 @@ class CarController(CarControllerBase):
       self.apply_angle_last = apply_steer_angle_limits_vm(actuators.steeringAngleDeg, self.apply_angle_last, CS.out.vEgoRaw, CS.out.steeringAngleDeg,
                                                           lat_active, CarControllerParams, self.VM)
 
-      can_sends.append(self.tesla_can.create_steering_control(self.apply_angle_last, lat_active))
+      can_sends.append(self.tesla_can.create_steering_control(*CoopSteeringCarController.update(self, self.apply_angle_last, lat_active, CS)))
 
     if self.frame % 10 == 0:
       can_sends.append(self.tesla_can.create_steering_allowed())
