@@ -47,4 +47,5 @@ private:
   QRectF clip_region;
 
   // FrogPilot variables
+  void updateRadarTracks(const cereal::XYZTData::Reader &line);
 };
