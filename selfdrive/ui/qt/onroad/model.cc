@@ -96,7 +96,7 @@ void ModelRenderer::update_model(const cereal::ModelDataV2::Reader &model, const
     UIState *s = uiState();
     path_width *= s->status == STATUS_ENGAGED ? 1.0f : s->status == STATUS_ALWAYS_ON_LATERAL_ACTIVE ? 0.75f : 0.50f;
   }
-  mapLineToPolygon(model_position, model_ui ? path_width : 0.9, path_offset_z, &track_vertices, max_idx, false);
+  mapLineToPolygon(model_position, model_ui ? path_width * (1 - (frogpilot_toggles.value("path_edge_width").toDouble() / 100.0f)) : 0.9, path_offset_z, &track_vertices, max_idx, false);
 
   // FrogPilot variables
   FrogPilotUIState *fs = frogpilotUIState();
@@ -109,6 +109,10 @@ void ModelRenderer::update_model(const cereal::ModelDataV2::Reader &model, const
   model_ui = frogpilot_toggles.value("model_ui").toBool();
   path_color = frogpilot_scene.path_color;
   use_stock_colors = frogpilot_scene.use_stock_colors;
+
+  frogpilot_nvg->track_vertices = track_vertices;
+
+  mapLineToPolygon(model_position, model_ui ? path_width : 0, path_offset_z, &frogpilot_nvg->track_edge_vertices, max_idx, false);
 
   mapAveragedLineToPolygon(lane_lines[0], lane_lines[1], frogpilotPlan.getLaneWidthLeft() / 2.0f, 0, &frogpilot_nvg->track_adjacent_vertices[0], max_idx, false);
   mapAveragedLineToPolygon(lane_lines[2], lane_lines[3], frogpilotPlan.getLaneWidthRight() / 2.0f, 0, &frogpilot_nvg->track_adjacent_vertices[1], max_idx, false);

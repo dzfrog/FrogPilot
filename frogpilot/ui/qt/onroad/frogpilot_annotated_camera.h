@@ -37,6 +37,8 @@ public:
   QPoint experimentalButtonPosition;
 
   QPolygonF track_adjacent_vertices[2];
+  QPolygonF track_edge_vertices;
+  QPolygonF track_vertices;
 
   QRect setSpeedRect;
 
@@ -54,6 +56,7 @@ private:
   void paintCompass(QPainter &p);
   void paintCurveSpeedControl(QPainter &p, SubMaster &fpsm);
   void paintCurveSpeedControlTraining(QPainter &p, SubMaster &fpsm);
+  void paintPathEdges(QPainter &p, const FrogPilotUIScene &frogpilot_scene, SubMaster &sm);
   void paintPedalIcons(QPainter &p, SubMaster &sm, SubMaster &fpsm, FrogPilotUIScene &frogpilot_scene);
   void paintRadarTracks(QPainter &p);
   void paintRoadName(QPainter &p);
