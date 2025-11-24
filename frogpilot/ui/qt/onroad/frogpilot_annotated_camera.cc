@@ -3,7 +3,9 @@
 FrogPilotAnnotatedCameraWidget::FrogPilotAnnotatedCameraWidget(QWidget *parent) : QWidget(parent) {
   animationTimer = new QTimer(this);
 
+  brakePedalImg = loadPixmap("../../frogpilot/assets/other_images/brake_pedal.png", {btn_size, btn_size});
   curveSpeedIcon = loadPixmap("../../frogpilot/assets/other_images/curve_speed.png", {btn_size, btn_size});
+  gasPedalImg = loadPixmap("../../frogpilot/assets/other_images/gas_pedal.png", {btn_size, btn_size});
   stopSignImg = loadPixmap("../../frogpilot/assets/other_images/stop_sign.png", {btn_size, btn_size});
 
   loadGif("../../frogpilot/assets/other_images/curve_icon.gif", cemCurveIcon, QSize(btn_size / 2, btn_size / 2), this);
@@ -196,6 +198,10 @@ void FrogPilotAnnotatedCameraWidget::paintFrogPilotWidgets(QPainter &p, UIState 
     }
   } else {
     glowTimer.invalidate();
+  }
+
+  if (frogpilot_toggles.value("pedals_on_ui").toBool()) {
+    paintPedalIcons(p, sm, fpsm, frogpilot_scene);
   }
 
   if (frogpilot_toggles.value("radar_tracks").toBool()) {
@@ -450,6 +456,35 @@ void FrogPilotAnnotatedCameraWidget::paintCurveSpeedControlTraining(QPainter &p,
   p.setFont(InterFont(35, QFont::Bold));
   p.setPen(QPen(whiteColor(), 6));
   p.drawText(textRect.adjusted(20, 0, 0, 0), Qt::AlignVCenter | Qt::AlignLeft, "Training...");
+
+  p.restore();
+}
+
+void FrogPilotAnnotatedCameraWidget::paintPedalIcons(QPainter &p, SubMaster &sm, SubMaster &fpsm, FrogPilotUIScene &frogpilot_scene) {
+  p.save();
+
+  const cereal::CarState::Reader &carState = sm["carState"].getCarState();
+  const cereal::FrogPilotCarState::Reader &frogpilotCarState = fpsm["frogpilotCarState"].getFrogpilotCarState();
+
+  float brakeOpacity = 1.0f;
+  float gasOpacity = 1.0f;
+
+  if (frogpilot_toggles.value("dynamic_pedals_on_ui").toBool()) {
+    brakeOpacity = frogpilot_scene.standstill ? 1.0f : carState.getAEgo() < -0.25f ? std::max(0.25f, std::abs(carState.getAEgo())) : 0.25f;
+    gasOpacity = std::max(0.25f, carState.getAEgo());
+  } else if (frogpilot_toggles.value("static_pedals_on_ui").toBool()) {
+    brakeOpacity = frogpilot_scene.standstill || frogpilotCarState.getBrakeLights() || carState.getAEgo() < -0.25f ? 1.0f : 0.25f;
+    gasOpacity = carState.getAEgo() > 0.25 ? 1.0f : 0.25f;
+  }
+
+  int startX = experimentalButtonPosition.x();
+  int startY = experimentalButtonPosition.y() + btn_size + UI_BORDER_SIZE;
+
+  p.setOpacity(brakeOpacity);
+  p.drawPixmap(startX, startY, brakePedalImg);
+
+  p.setOpacity(gasOpacity);
+  p.drawPixmap(startX + btn_size / 2, startY, gasPedalImg);
 
   p.restore();
 }

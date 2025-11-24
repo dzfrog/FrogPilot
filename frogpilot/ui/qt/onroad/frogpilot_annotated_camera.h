@@ -50,6 +50,7 @@ private:
   void paintCompass(QPainter &p);
   void paintCurveSpeedControl(QPainter &p, SubMaster &fpsm);
   void paintCurveSpeedControlTraining(QPainter &p, SubMaster &fpsm);
+  void paintPedalIcons(QPainter &p, SubMaster &sm, SubMaster &fpsm, FrogPilotUIScene &frogpilot_scene);
   void paintRadarTracks(QPainter &p);
   void paintRoadName(QPainter &p);
   void paintStandstillTimer(QPainter &p);
@@ -81,7 +82,9 @@ private:
   QElapsedTimer glowTimer;
   QElapsedTimer standstillTimer;
 
+  QPixmap brakePedalImg;
   QPixmap curveSpeedIcon;
+  QPixmap gasPedalImg;
   QPixmap stopSignImg;
 
   QPoint cemStatusPosition;
