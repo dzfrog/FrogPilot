@@ -50,7 +50,7 @@ STEER_DESIRED_LIMITER_OVERRIDE_ACTIVE_COUNTER = 0.7 # second
 STEER_RESUME_RATE_LIMIT_RAMP_RATE = 500 # deg/s^2 - controls rate of rise of angle rate limit, not angle directly
 
 
-CoopSteeringDataSP = namedtuple("CoopSteeringDataSP",
+CoopSteeringData = namedtuple("CoopSteeringData",
                                 ["steeringAngleDeg", "lat_active", "control_type"])
 
 
@@ -295,7 +295,7 @@ class CoopSteeringCarController:
     apply_angle_lim = self.resume_rate_limiter.update(apply_angle, angle_rate_delta_lim)
     return apply_angle_lim
 
-  def coop_steering_update(self, apply_angle, lat_active, CP_SP: structs.CarParamsSP, CS: structs.CarState, VM: VehicleModel) -> CoopSteeringDataSP:
+  def coop_steering_update(self, apply_angle, lat_active, CS: structs.CarState, VM: VehicleModel) -> CoopSteeringData:
     # estimate real steering angle by adding rate to the tesla filtered angle
     steeringAngleDegPhaseLead = CS.out.steeringAngleDeg + CS.out.steeringRateDeg / STEERING_DEG_PHASE_LEAD_COEFF
 
@@ -322,7 +322,7 @@ class CoopSteeringCarController:
     self.coop_steeringAngleDeg = apply_steer_angle_limits_vm(apply_angle, self.coop_steeringAngleDeg, CS.out.vEgoRaw,
                                                     CS.out.steeringAngleDeg, lat_active, CoopSteeringCarControllerParams, self.VM)
 
-    return CoopSteeringDataSP(self.coop_steeringAngleDeg, lat_active, control_type)
+    return CoopSteeringData(self.coop_steeringAngleDeg, lat_active, control_type)
 
-  def update(self, apply_angle, lat_active, CP_SP: structs.CarParamsSP, CS: structs.CarState) -> CoopSteeringDataSP:
-    return self.coop_steering_update(apply_angle, lat_active, CP_SP, CS, self.VM)
+  def update(self, apply_angle, lat_active, CS: structs.CarState) -> CoopSteeringData:
+    return self.coop_steering_update(apply_angle, lat_active, CS, self.VM)

@@ -42,7 +42,7 @@ class CarController(CarControllerBase, CoopSteeringCarController):
       self.apply_angle_last = apply_steer_angle_limits_vm(actuators.steeringAngleDeg, self.apply_angle_last, CS.out.vEgoRaw, CS.out.steeringAngleDeg,
                                                           lat_active, CarControllerParams, self.VM)
 
-      can_sends.append(self.tesla_can.create_steering_control(*CoopSteeringCarController.update(self, self.apply_angle_last, lat_active, self.CP_SP, CS)))
+      can_sends.append(self.tesla_can.create_steering_control(*CoopSteeringCarController.update(self, self.apply_angle_last, lat_active, CS)))
 
     if self.frame % 10 == 0:
       can_sends.append(self.tesla_can.create_steering_allowed())
