@@ -35,6 +35,7 @@ protected:
 
 private:
   void paintBlindSpotPath(QPainter &p, SubMaster &sm, SubMaster &fpsm);
+  void paintCompass(QPainter &p);
 
   float distanceConversion;
   float setSpeed;
@@ -48,6 +49,8 @@ private:
   QColor blueColor(int alpha = 255) { return QColor(0, 0, 255, alpha); }
   QColor redColor(int alpha = 255) { return QColor(201, 34, 49, alpha); }
   QColor whiteColor(int alpha = 255) { return QColor(255, 255, 255, alpha); }
+
+  QPoint compassPosition;
 
   QString accelerationUnit;
   QString leadDistanceUnit;
