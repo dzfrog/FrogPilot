@@ -17,6 +17,10 @@ public:
 private:
   void paintEvent(QPaintEvent *event);
   void paintFPS(QPainter &p, const QRect &rect);
+  void paintSteeringTorqueBorder(QPainter &p, const QRect &rect);
 
   bool showFPS;
+  bool showSteering;
+
+  float torque;
 };
