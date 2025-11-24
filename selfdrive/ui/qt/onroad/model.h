@@ -45,6 +45,8 @@ private:
   QRectF clip_region;
 
   // FrogPilot variables
+  void updateRadarTracks(const cereal::XYZTData::Reader &line);
+
   bool model_ui;
   bool use_stock_colors;
 
