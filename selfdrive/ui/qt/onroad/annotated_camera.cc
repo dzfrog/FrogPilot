@@ -37,6 +37,11 @@ void AnnotatedCameraWidget::updateState(const UIState &s, const FrogPilotUIState
   hud.frogpilot_nvg = frogpilot_nvg;
   model.frogpilot_nvg = frogpilot_nvg;
 
+  dmon.frogpilot_toggles = frogpilot_toggles;
+  experimental_btn->frogpilot_toggles = frogpilot_toggles;
+  hud.frogpilot_toggles = frogpilot_toggles;
+  model.frogpilot_toggles = frogpilot_toggles;
+
   frogpilot_nvg->experimentalButtonPosition = QPoint(experimental_btn->x(), experimental_btn->y());
 }
 

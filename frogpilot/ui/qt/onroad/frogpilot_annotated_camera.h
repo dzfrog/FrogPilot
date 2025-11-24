@@ -21,6 +21,8 @@ public:
 
   float speed;
 
+  QJsonObject frogpilot_toggles;
+
   QPoint dmIconPosition;
   QPoint experimentalButtonPosition;
 

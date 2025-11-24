@@ -7,6 +7,7 @@ void FrogPilotOnroadWindow::updateState(const UIState &s, const FrogPilotUIState
   const SubMaster &sm = *(s.sm);
 
   const FrogPilotUIScene &frogpilot_scene = fs.frogpilot_scene;
+  const QJsonObject &frogpilot_toggles = frogpilot_scene.frogpilot_toggles;
   const SubMaster &fpsm = *(fs.sm);
 
   const cereal::CarState::Reader &carState = sm["carState"].getCarState();
