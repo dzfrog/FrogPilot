@@ -45,4 +45,5 @@ private:
   QRectF clip_region;
 
   // FrogPilot variables
+  bool model_ui;
 };
