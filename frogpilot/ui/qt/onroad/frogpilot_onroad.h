@@ -10,6 +10,8 @@ public:
 
   void updateState(const UIState &s, const FrogPilotUIState &fs);
 
+  double fps;
+
   FrogPilotUIScene frogpilot_scene;
 
   QColor bg;
@@ -18,4 +20,7 @@ public:
 
 private:
   void paintEvent(QPaintEvent *event);
+  void paintFPS(QPainter &p, const QRect &rect);
+
+  bool showFPS;
 };
