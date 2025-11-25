@@ -299,7 +299,7 @@ class CoopSteeringCarController:
     # estimate real steering angle by adding rate to the tesla filtered angle
     steeringAngleDegPhaseLead = CS.out.steeringAngleDeg + CS.out.steeringRateDeg / STEERING_DEG_PHASE_LEAD_COEFF
 
-    lkas_enabled = False
+    lkas_enabled = True
     angle_coop_enabled = True
 
     # 1 = angle control, 2 = LKAS mode; todo: use CAN parser enums
